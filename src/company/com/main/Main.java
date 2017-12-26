@@ -6,10 +6,8 @@ import company.com.tests.TestClass;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) throws InvocationTargetException, IllegalAccessException, InstantiationException {
@@ -58,8 +56,8 @@ public class Main {
                     method.invoke(testClassInstance);
                     results.get(TestStatus.PASSED).add(method.getName());
                 } else if (method.isAnnotationPresent(Test.class) && !method.getAnnotation(Test.class).isEnebled()){
-
                     results.get(TestStatus.SKIPPED).add(method.getName());
+                    continue;
                 }
             } catch (InvocationTargetException e) {
                 if (method.isAnnotationPresent(Expected.class) &&
