@@ -68,14 +68,12 @@ public class Main {
             if (before != null) {
                 before.invoke(testClassInstance);
             }
+            TestStatus res = TestStatus.PASSED;
             try {
                 method.invoke(testClassInstance);
-                results.get(TestStatus.PASSED).add(method.getName());
             } catch (InvocationTargetException e) {
-                if (method.isAnnotationPresent(Expected.class) &&
-                        method.getAnnotation(Expected.class).exception().equals(e.getCause().getClass())) {
-                    results.get(TestStatus.PASSED).add(method.getName());
-                } else {
+                if (!method.isAnnotationPresent(Expected.class) ||
+                        !method.getAnnotation(Expected.class).exception().equals(e.getCause().getClass())) {
                     results.get(TestStatus.FAILED).add(method.getName());
                 }
             }
