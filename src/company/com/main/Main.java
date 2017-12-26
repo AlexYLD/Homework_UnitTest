@@ -26,58 +26,62 @@ public class Main {
         for (Method method : declaredMethods) {
             if (method.isAnnotationPresent(SetUp.class)) {
                 if (setUp != null) {
-                    throw new RuntimeException("Illegal envirement");
+                    throw new RuntimeException("Illegal environment");
                 }
                 setUp = method;
 
             }
             if (method.isAnnotationPresent(Before.class)) {
                 if (before != null) {
-                    throw new RuntimeException("Illegal envirement");
+                    throw new RuntimeException("Illegal environment");
                 }
                 before = method;
             }
             if (method.isAnnotationPresent(After.class)) {
                 if (after != null) {
-                    throw new RuntimeException("Illegal envirement");
+                    throw new RuntimeException("Illegal environment");
                 }
                 after = method;
 
             }
             if (method.isAnnotationPresent(Destroy.class)) {
                 if (destroy != null) {
-                    throw new RuntimeException("Illegal envirement");
+                    throw new RuntimeException("Illegal environment");
                 }
                 destroy = method;
             }
         }
 
 
-        if (setUp != null) setUp.invoke(testClassInstance);
+        if (setUp != null) {
+            setUp.invoke(testClassInstance);
+        }
 
         for (Method method : declaredMethods) {
             if (!method.isAnnotationPresent(Test.class)) {
                 continue;
             }
-            if (method.getAnnotation(Test.class).isEnebled()) {
-                if (before != null) before.invoke(testClassInstance);
-                try {
-                    method.invoke(testClassInstance);
-                    results.get(TestStatus.PASSED).add(method.getName());
-                } catch (InvocationTargetException e) {
-                    if (method.isAnnotationPresent(Expected.class) &&
-                            method.getAnnotation(Expected.class).exception().equals(e.getCause().getClass())) {
-                        results.get(TestStatus.PASSED).add(method.getName());
-                    } else {
-                        results.get(TestStatus.FAILED).add(method.getName());
-                    }
-
-                }
-            } else {
+            if (!method.getAnnotation(Test.class).isEnebled()) {
                 results.get(TestStatus.SKIPPED).add(method.getName());
                 continue;
             }
-            if (after != null) after.invoke(testClassInstance);
+            if (before != null) {
+                before.invoke(testClassInstance);
+            }
+            try {
+                method.invoke(testClassInstance);
+                results.get(TestStatus.PASSED).add(method.getName());
+            } catch (InvocationTargetException e) {
+                if (method.isAnnotationPresent(Expected.class) &&
+                        method.getAnnotation(Expected.class).exception().equals(e.getCause().getClass())) {
+                    results.get(TestStatus.PASSED).add(method.getName());
+                } else {
+                    results.get(TestStatus.FAILED).add(method.getName());
+                }
+            }
+            if (after != null) {
+                after.invoke(testClassInstance);
+            }
         }
         if (destroy != null) destroy.invoke(testClassInstance);
         System.out.println(results);
