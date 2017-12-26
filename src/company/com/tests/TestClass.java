@@ -5,12 +5,7 @@ import company.com.annotations.Expected;
 import company.com.annotations.SetUp;
 import company.com.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 public class TestClass {
-    HashMap<String, List<String>> testMap;
 
     @SetUp
     public void setUp() {
