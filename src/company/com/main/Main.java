@@ -22,31 +22,37 @@ public class Main {
         Method before = null;
         Method after = null;
         Method destroy = null;
-        int[] count = new int[4];
+
         for (Method method : declaredMethods) {
             if (method.isAnnotationPresent(SetUp.class)) {
+                if (setUp != null) {
+                    throw new RuntimeException("Illegal envirement");
+                }
                 setUp = method;
-                count[0]++;
+
             }
             if (method.isAnnotationPresent(Before.class)) {
+                if (before != null) {
+                    throw new RuntimeException("Illegal envirement");
+                }
                 before = method;
-                count[1]++;
             }
             if (method.isAnnotationPresent(After.class)) {
+                if (after != null) {
+                    throw new RuntimeException("Illegal envirement");
+                }
                 after = method;
-                count[2]++;
+
             }
             if (method.isAnnotationPresent(Destroy.class)) {
+                if (destroy != null) {
+                    throw new RuntimeException("Illegal envirement");
+                }
                 destroy = method;
-                count[3]++;
             }
         }
 
-        for (int counter : count){
-            if(counter>1){
-                throw new RuntimeException("Illegal envirement");
-            }
-        }
+
         if (setUp != null) setUp.invoke(testClassInstance);
 
         for (Method method : declaredMethods) {
@@ -55,7 +61,7 @@ public class Main {
                     if (before != null) before.invoke(testClassInstance);
                     method.invoke(testClassInstance);
                     results.get(TestStatus.PASSED).add(method.getName());
-                } else if (method.isAnnotationPresent(Test.class) && !method.getAnnotation(Test.class).isEnebled()){
+                } else if (method.isAnnotationPresent(Test.class) && !method.getAnnotation(Test.class).isEnebled()) {
                     results.get(TestStatus.SKIPPED).add(method.getName());
                     continue;
                 }
@@ -68,9 +74,9 @@ public class Main {
                 }
 
             }
-            if(after!=null) after.invoke(testClassInstance);
+            if (after != null) after.invoke(testClassInstance);
         }
-        if(destroy!=null) destroy.invoke(testClassInstance);
+        if (destroy != null) destroy.invoke(testClassInstance);
         System.out.println(results);
     }
 
