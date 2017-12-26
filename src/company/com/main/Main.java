@@ -56,23 +56,26 @@ public class Main {
         if (setUp != null) setUp.invoke(testClassInstance);
 
         for (Method method : declaredMethods) {
-            try {
-                if (method.isAnnotationPresent(Test.class) && method.getAnnotation(Test.class).isEnebled()) {
-                    if (before != null) before.invoke(testClassInstance);
+            if (!method.isAnnotationPresent(Test.class)) {
+                continue;
+            }
+            if (method.getAnnotation(Test.class).isEnebled()) {
+                if (before != null) before.invoke(testClassInstance);
+                try {
                     method.invoke(testClassInstance);
                     results.get(TestStatus.PASSED).add(method.getName());
-                } else if (method.isAnnotationPresent(Test.class) && !method.getAnnotation(Test.class).isEnebled()) {
-                    results.get(TestStatus.SKIPPED).add(method.getName());
-                    continue;
-                }
-            } catch (InvocationTargetException e) {
-                if (method.isAnnotationPresent(Expected.class) &&
-                        method.getAnnotation(Expected.class).exception().equals(e.getCause().getClass())) {
-                    results.get(TestStatus.PASSED).add(method.getName());
-                } else {
-                    results.get(TestStatus.FAILED).add(method.getName());
-                }
+                } catch (InvocationTargetException e) {
+                    if (method.isAnnotationPresent(Expected.class) &&
+                            method.getAnnotation(Expected.class).exception().equals(e.getCause().getClass())) {
+                        results.get(TestStatus.PASSED).add(method.getName());
+                    } else {
+                        results.get(TestStatus.FAILED).add(method.getName());
+                    }
 
+                }
+            } else {
+                results.get(TestStatus.SKIPPED).add(method.getName());
+                continue;
             }
             if (after != null) after.invoke(testClassInstance);
         }
